@@ -5,7 +5,7 @@ import folium
 def main():
     st.set_page_config(
         page_title="Oil AI - Your Oil and Gas Companion",
-        page_icon="🚛",
+        page_icon="🛢️",
         layout="wide",
     )
     st.title("Oil AI 🛢️")
@@ -21,25 +21,19 @@ def main():
     )
     st.divider()
 
-    # # Year Selection Section
-    # st.markdown("## Select Years of Interest")
-    # year_range = st.slider(
-    #     "Select the range of years you are interested in:",
-    #     min_value=1960,
-    #     max_value=2022,
-    #     value=(2000, 2020)
-    # )
-    # st.write(f"Selected years: {year_range[0]} to {year_range[1]}")
-    # # Country Selection Section
-    # st.markdown("## Select Regions or Countries")
-    # countries = st.multiselect(
-    #     "Which countries or regions would you like to analyze?",
-    #     options=["USA", "Canada", "Saudi Arabia", "Russia", "Brazil", "Norway", "Nigeria", "China"],
-    #     default=["USA", "Canada"]
-    # )
-    # st.write(f"Selected countries or regions: {', '.join(countries)}")
-
+    # Getting Started Section
     st.header("Getting Started")
+
+    # Year Selection Scroll Section
+    st.markdown("## Select Year Range")
+    year_range = st.slider(
+        "Select the range of years for your analysis:",
+        min_value=1960,
+        max_value=2022,
+        value=(2000, 2020),
+        step=1
+    )
+    st.write(f"Year range selected: {year_range[0]} to {year_range[1]}")
 
     # Oil Seller Location Selection Section
     st.markdown("#### Select Oil Seller Locations")
