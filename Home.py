@@ -8,6 +8,41 @@ def main():
         page_icon="🛢️",
         layout="wide",
     )
+
+    # Sidebar
+    with st.sidebar:
+        st.header("Sidebar Options")
+        
+        # Navigation Menu
+        # st.subheader("Navigation")
+        # nav_option = st.radio("Go to:", options=["Home", "01_Chatbot_🤖", "02_Report_Generator_📄"])
+        # st.write(f"Selected: {nav_option}")
+        
+        # Filters
+        # st.subheader("Filters")
+        # filter_year = st.slider("Year Filter:", min_value=1960, max_value=2022, value=(2000, 2020))
+        # st.write(f"Filter Years: {filter_year[0]} to {filter_year[1]}")
+
+        # selected_regions = st.multiselect("Select Regions:", ["North America", "Middle East", "Europe", "Asia", "South America", "Africa"], default=["North America"])
+        # st.write(f"Selected Regions: {', '.join(selected_regions)}")
+
+        # User Preferences
+        st.subheader("User Preferences")
+        dark_mode = st.checkbox("Enable Dark Mode", value=False)
+        notifications = st.checkbox("Enable Notifications", value=True)
+        st.write(f"Dark Mode: {'On' if dark_mode else 'Off'}, Notifications: {'On' if notifications else 'Off'}")
+
+        # Contact and Info
+        st.subheader("Contact & Info")
+        st.markdown(
+            """
+            - [Support](mailto:support@oilai.com)
+            - [Documentation](https://oilai-docs.com)
+            - [GitHub](https://github.com/bestisblessed)
+            """
+        )
+
+    # Title
     st.title("Oil AI 🛢️")
     st.markdown("Intelligent Assistant for Oil and Gas Industry")
     st.divider()
