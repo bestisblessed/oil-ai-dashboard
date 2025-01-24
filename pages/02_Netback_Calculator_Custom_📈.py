@@ -8,6 +8,11 @@ with tab1:
     location_name = st.text_input("Enter location name:", "Custom Location")
     distance = st.number_input("Enter distance (km):", value=0.0, min_value=0.0)
     with st.sidebar:
+        st.header("Constants")
+        density_equalization_factor = 0.49
+        sulphur_equalization_factor = 1.38
+        st.write(f"Density Equalization Factor: {density_equalization_factor}")
+        st.write(f"Sulphur Equalization Factor: {sulphur_equalization_factor}")
         st.header("Input Variables")
         delivered_density = st.number_input("Delivered Density", value=0.0)
         delivered_sulfur = st.number_input("Delivered Sulfur", value=0.0)
@@ -19,11 +24,6 @@ with tab1:
         blending_uptick = st.number_input("Blending Uptick", value=0.0)
         pl_tariff = st.number_input("Pipeline Tariff", value=0.0)
         la = st.number_input("LA", value=0.0)
-        st.header("Constants")
-        density_equalization_factor = 0.49
-        sulphur_equalization_factor = 1.38
-        st.write(f"Density Equalization Factor: {density_equalization_factor}")
-        st.write(f"Sulphur Equalization Factor: {sulphur_equalization_factor}")
     if st.button("Calculate Netback"):
         base_price = ((wti + diff) * conversion * fx) + wadf
         base_price_adjusted = base_price + blending_uptick
