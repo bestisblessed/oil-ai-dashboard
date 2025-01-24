@@ -62,7 +62,7 @@ with tab1:
             density_penalty = (loc_values["Delivered Density"] - 825) * density_equalization_factor
             eq = -(density_penalty + sulfur_penalty)
             trucking_charge = -(5.40 * selected_distance) + 225
-            netback = base_price_adjusted + eq + loc_values["Pipeline Tariff"] + trucking_charge + loc_values["LA"]
+            netback = base_price_adjusted + eq + loc_values["P/L Tariff"] + trucking_charge + loc_values["LA"] + loc_values["Dilutent Fee"] + loc_values["Premium"]
             results.append({
                 "Location": location,
                 "Netback (CAD/m3)": round(netback, 2)
