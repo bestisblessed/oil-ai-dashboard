@@ -19,7 +19,7 @@ with tab1:
     selected_locations = st.multiselect(
         "Select locations:",
         options=location_names,
-        default=[location_names[0]]
+        default=[]
     )
     map_center = [40.0, -95.0]
     folium_map = folium.Map(location=map_center, zoom_start=4)
