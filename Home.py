@@ -109,8 +109,7 @@ def main():
     st.markdown("---")
     st.markdown(
         """
-        Created by Tyler Durette | 
-        Oil AI © 2025 | [GitHub](https://github.com/bestisblessed) | [Contact Me](mailto:tyler.durette@gmail.com)
+        Created by Tyler Durette | Oil AI © 2025 | [GitHub](https://github.com/bestisblessed) | [Contact Me](mailto:tyler.durette@gmail.com)
         """
     )
 
