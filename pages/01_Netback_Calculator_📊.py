@@ -4,6 +4,7 @@ import folium
 from streamlit_folium import st_folium
 import os
 import plotly.express as px
+from io import BytesIO
 st.title("Netback Calculator")
 st.write("Calculate the netback for locations and download report.")
 current_dir = os.path.dirname(__file__)  
@@ -13,7 +14,6 @@ try:
 except FileNotFoundError:
     st.error("The location_values.csv file could not be found. Please ensure it exists in the ../data directory.")
     st.stop()
-# Initialize session state for results
 if 'netback_results' not in st.session_state:
     st.session_state['netback_results'] = []
 tab1, tab2 = st.tabs(["Selling", "Buying"])
@@ -75,86 +75,77 @@ with tab1:
             netback = base_price_adjusted + eq + loc_values["P/L Tariff"] + trucking_charge + loc_values["LA"] + loc_values["Dilutent Fee"] + loc_values["Premium"]
             results.append({
                 "Location": location,
-                "Netback (CAD/m3)": round(netback, 2)
+                "Netback (CAD/m³)": round(netback, 2)
             })
         st.session_state['netback_results'] = results
     if st.session_state['netback_results']:
         results_df = pd.DataFrame(st.session_state['netback_results'])
         st.write("Netback Results:")
         st.dataframe(results_df.style.format({
-            "Netback (CAD/m3)": "{:.2f}"
+            "Netback (CAD/m³)": "{:.2f}"
         }))
-        report_data = []
-        for location in selected_locations:
-            netback_value = next((item["Netback (CAD/m3)"] for item in st.session_state['netback_results'] if item["Location"] == location), None)
-            if netback_value is not None:
-                report_data.append({
-                    "Location": location,
-                    "Netback (CAD/m3)": round(netback_value, 2)
-                })
-        report_df = pd.DataFrame(report_data)
-        @st.cache_data
-        def convert_df(df):
-            return df.to_csv(index=False).encode('utf-8')
-        csv = convert_df(report_df)
+        def generate_html_report(df, bar_chart, box_plot, best_route):
+            html_content = f"""
+            <html>
+            <head>
+                <title>Netback Report</title>
+            </head>
+            <body>
+                <h1 style="text-align: center;">Netback Report</h1>
+                <h2>Results Table</h2>
+                {df.to_html(index=False)}
+                <h2>Recommendation</h2>
+                <p>Based on the calculations, the location with the highest netback is <strong>{best_route['Location']}</strong> with a netback of <strong>{best_route['Netback (CAD/m³)']}</strong> CAD/m³.</p>
+                <h2>Netback by Location</h2>
+                {bar_chart.to_html(full_html=False, include_plotlyjs='cdn')}
+                <h2>Netback Distribution</h2>
+                {box_plot.to_html(full_html=False, include_plotlyjs='cdn')}
+            </body>
+            </html>
+            """
+            return html_content
+        fig_bar = px.bar(results_df, x="Location", y="Netback (CAD/m³)", title="Netback by Location", color="Location")
+        fig_box = px.box(results_df, x="Netback (CAD/m³)", title="Netback Distribution Across Locations", points="all")
+        best_route = results_df.loc[results_df["Netback (CAD/m³)"].idxmax()]
+        html_report = generate_html_report(results_df, fig_bar, fig_box, best_route)
+        csv = results_df.to_csv(index=False).encode('utf-8')
         st.download_button(
-            label="Download Report as CSV",
+            label="Download Results as CSV",
             data=csv,
-            file_name="netback_report.csv",
-            mime="text/csv",
+            file_name="netback_results.csv",
+            mime="text/csv"
+        )
+        st.download_button(
+            label="Download Report as HTML",
+            data=html_report.encode('utf-8'),
+            file_name="netback_report.html",
+            mime="text/html"
         )
         st.divider()
         st.subheader("Analysis")
         st.write("")
         if len(st.session_state['netback_results']) > 1:
-            best_option = max(st.session_state['netback_results'], key=lambda x: x["Netback (CAD/m3)"])
-            worst_option = min(st.session_state['netback_results'], key=lambda x: x["Netback (CAD/m3)"])
-            avg_netback = sum(r["Netback (CAD/m3)"] for r in st.session_state['netback_results']) / len(st.session_state['netback_results'])
+            best_option = max(st.session_state['netback_results'], key=lambda x: x["Netback (CAD/m³)"])
+            worst_option = min(st.session_state['netback_results'], key=lambda x: x["Netback (CAD/m³)"])
+            avg_netback = sum(r["Netback (CAD/m³)"] for r in st.session_state['netback_results']) / len(st.session_state['netback_results'])
             col1, col2, col3 = st.columns(3)
             with col1:
                 st.metric("Best Option", 
                          f"{best_option['Location']}", 
-                         f"${best_option['Netback (CAD/m3)']:.2f}/m³")
+                         f"${best_option['Netback (CAD/m³)']:.2f}/m³")
             with col2:
                 st.metric("Average Netback", 
                          f"${avg_netback:.2f}/m³")
             with col3:
                 st.metric("Spread (Best to Worst)", 
-                         f"${best_option['Netback (CAD/m3)'] - worst_option['Netback (CAD/m3)']:.2f}/m³")
-            fig = px.bar(results_df, x="Location", y="Netback (CAD/m3)", 
-                          title="Netback by Location", 
-                          color="Location", 
-                          barmode="group", 
-                          category_orders={"Location": results_df["Location"].unique()})
-            fig.update_xaxes(title_text='Location')
-            fig.update_yaxes(title_text='Netback (CAD/m3)')
-            st.plotly_chart(fig)
-            # Box Plot: Distribution of Netbacks
-            if len(st.session_state['netback_results']) > 1:
-                fig_box = px.box(results_df, x="Netback (CAD/m3)", title="Netback Distribution Across Locations", points="all")
-                fig_box.update_xaxes(title_text="Netback (CAD/m3)")
-                fig_box.update_yaxes(title_text="")  # Optional, remove y-axis label for cleaner display
-                st.plotly_chart(fig_box)
-            else:
-                st.info("Select multiple locations to see the netback distribution.")
-            # Sort results by netback value
-            sorted_results = sorted(st.session_state['netback_results'], key=lambda x: x["Netback (CAD/m3)"], reverse=True)
-            # Create comparison text
-            comparison_text = [
-                f"1. **{best_option['Location']}** is the most profitable option with a netback of ${best_option['Netback (CAD/m3)']:.2f}/m³."
-            ]
-            # Add comparisons for each location relative to the best option
-            for result in sorted_results[1:]:
-                difference = best_option["Netback (CAD/m3)"] - result["Netback (CAD/m3)"]
-                comparison_text.append(
-                    f"- **{result['Location']}** yields ${result['Netback (CAD/m3)']:.2f}/m³ "
-                    f"(${difference:.2f}/m³ less than the best option)"
-                )
-            best_route = results_df.loc[results_df["Netback (CAD/m3)"].idxmax()]
-            st.write("### Recommendation")
-            st.write(f"Based on the calculations, the location with the highest netback is **{best_route['Location']}** with a netback of **{best_route['Netback (CAD/m3)']} CAD/m3**.")
+                         f"${best_option['Netback (CAD/m³)'] - worst_option['Netback (CAD/m³)']:.2f}/m³")
+            st.plotly_chart(fig_bar)
+            st.plotly_chart(fig_box)
         else:
             st.info("Please select multiple locations to see comparison analysis.")
+        best_route = results_df.loc[results_df["Netback (CAD/m³)"].idxmax()]
+        st.write("### Recommendation")
+        st.write(f"Based on the calculations, the location with the highest netback is **{best_route['Location']}** with a netback of **{best_route['Netback (CAD/m³)']} CAD/m³**.")
 with tab2:
     st.subheader("Calculations")
     st.write("Content for buying calculations will go here.")
