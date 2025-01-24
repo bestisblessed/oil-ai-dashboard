@@ -1,3 +1,7 @@
 [theme]
 base="light"
 font="serif"
+textColor="#000000"
+#secondaryBackgroundColor="#0090c3"  # A little lighter blue for contrast areas
+#primaryColor="#808080"  # Grey color for primary features
+#backgroundColor="#f0f0f0"  # Light grey background

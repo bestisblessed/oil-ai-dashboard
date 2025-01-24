@@ -137,6 +137,7 @@ with tab1:
             trucking_charge = -(5.40 * distance_km) + 225
             netback = base_price_adjusted + eq + pl_tariff + trucking_charge + la + dilutent_fee + premium_or_discount
 
+            st.divider()
             st.success(f"Netback Calculated: {netback:.2f} USD")
 
             # Prepare a DataFrame for the result

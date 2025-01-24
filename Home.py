@@ -46,7 +46,7 @@ st.markdown("##### **EQ**")
 st.code("EQ = -(Density Penalty + Sulphur Penalty)")
 st.write("")
 st.markdown("##### **Netback**")
-st.code("Netback = Base Price Adjusted + EQ + P/L Tariff + Trucking Charge")
+st.code("Netback = Base Price Adjusted + EQ + P/L Tariff + Trucking Charge + LA + Dilutent Fee + Premium")
 st.write("")
 st.markdown("---")
 st.markdown(
