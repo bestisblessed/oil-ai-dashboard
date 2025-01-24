@@ -46,7 +46,7 @@ def main():
 
     # Title
     st.title("Oil AI 🛢️")
-    st.markdown("Intelligent assistant for oil and gas Industry")
+    st.markdown("Intelligent assistant for oil and gas industry")
     st.divider()
     st.markdown("## Features")
     st.markdown(
@@ -109,7 +109,7 @@ def main():
     st.markdown("---")
     st.markdown(
         """
-        Created by Tyler Durette
+        Created by Tyler Durette | 
         Oil AI © 2025 | [GitHub](https://github.com/bestisblessed) | [Contact Me](mailto:tyler.durette@gmail.com)
         """
     )
