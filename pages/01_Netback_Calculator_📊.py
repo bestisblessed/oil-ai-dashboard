@@ -90,6 +90,58 @@ with tab1:
             file_name="netback_report.csv",
             mime="text/csv",
         )
+        st.divider()
+
+        # Add analysis section
+        st.subheader("Analysis")
+        if len(results) > 1:
+            # Find best and worst options
+            best_option = max(results, key=lambda x: x["Netback (CAD/m3)"])
+            worst_option = min(results, key=lambda x: x["Netback (CAD/m3)"])
+            
+            # Calculate average netback
+            avg_netback = sum(r["Netback (CAD/m3)"] for r in results) / len(results)
+            
+            # Create comparison analysis
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                st.metric("Best Option", 
+                         f"{best_option['Location']}", 
+                         f"${best_option['Netback (CAD/m3)']:.2f}/m³")
+            
+            with col2:
+                st.metric("Average Netback", 
+                         f"${avg_netback:.2f}/m³")
+            
+            with col3:
+                st.metric("Spread (Best to Worst)", 
+                         f"${best_option['Netback (CAD/m3)'] - worst_option['Netback (CAD/m3)']:.2f}/m³")
+            
+            
+            # Sort results by netback value
+            sorted_results = sorted(results, key=lambda x: x["Netback (CAD/m3)"], reverse=True)
+            
+            # Create comparison text
+            comparison_text = [
+                f"1. **{best_option['Location']}** is the most profitable option with a netback of ${best_option['Netback (CAD/m3)']:.2f}/m³."
+            ]
+            
+            # Add comparisons for each location relative to the best option
+            for result in sorted_results[1:]:
+                difference = best_option["Netback (CAD/m3)"] - result["Netback (CAD/m3)"]
+                comparison_text.append(
+                    f"- **{result['Location']}** yields ${result['Netback (CAD/m3)']:.2f}/m³ "
+                    f"(${difference:.2f}/m³ less than the best option)"
+                )
+            
+            
+            best_route = results_df.loc[results_df["Netback (CAD/m3)"].idxmax()]
+            st.write("### Recommendation")
+            st.write(f"Based on the calculations, the location with the highest netback is **{best_route['Location']}** with a netback of **{best_route['Netback (CAD/m3)']} CAD/m3**.")
+
+        else:
+            st.info("Please select multiple locations to see comparison analysis.")
 with tab2:
     st.subheader("Calculations")
     st.write("Content for buying calculations will go here.")
