@@ -71,20 +71,32 @@ with tab1:
         st.write(f"Density Equalization Factor: {density_equalization_factor}")
         st.write(f"Sulphur Equalization Factor: {sulphur_equalization_factor}")
         st.header("Input Variables")
-        delivered_density = st.number_input("Delivered Density", value=0.0)
-        delivered_sulfur = st.number_input("Delivered Sulfur", value=0.0)
-        conversion = st.number_input("Conversion Factor", value=0.0)
-        wti = st.number_input("WTI", value=0.0)
-        fx = st.number_input("FX Rate", value=0.0)
-        diff = st.number_input("Differential", value=0.0)
-        wadf = st.number_input("WADF", value=0.0)
-        blending_uptick = st.number_input("Blending Uptick", value=0.0)
-        pl_tariff = st.number_input("P/L Tariff", value=0.0)
-        la = st.number_input("LA", value=0.0)
-        dilutent_fee = st.number_input("Dilutent Fee", value=0.0)
-        premium_or_discount = st.number_input("Premium or Discount", value=0.0)
+        delivered_density = st.number_input("Delivered Density", value=None, format="%f")
+        delivered_sulfur = st.number_input("Delivered Sulfur", value=None, format="%f")
+        conversion = st.number_input("Conversion Factor", value=None, format="%f")
+        wti = st.number_input("WTI", value=None, format="%f")
+        fx = st.number_input("FX Rate", value=None, format="%f")
+        diff = st.number_input("Differential", value=None, format="%f")
+        wadf = st.number_input("WADF", value=None, format="%f")
+        blending_uptick = st.number_input("Blending Uptick", value=None, format="%f")
+        pl_tariff = st.number_input("P/L Tariff", value=None, format="%f")
+        la = st.number_input("LA", value=None, format="%f")
+        dilutent_fee = st.number_input("Dilutent Fee", value=None, format="%f")
+        premium = st.number_input("Premium or Discount", value=None, format="%f")
         equalized = st.radio("Equalized?", ('Yes', 'No'), index=1)
     if st.session_state['distance_calculated']:
+        delivered_density = delivered_density if delivered_density is not None else 0.0
+        delivered_sulfur = delivered_sulfur if delivered_sulfur is not None else 0.0
+        conversion = conversion if conversion is not None else 0.0
+        wti = wti if wti is not None else 0.0
+        fx = fx if fx is not None else 0.0
+        diff = diff if diff is not None else 0.0
+        wadf = wadf if wadf is not None else 0.0
+        blending_uptick = blending_uptick if blending_uptick is not None else 0.0
+        pl_tariff = pl_tariff if pl_tariff is not None else 0.0
+        la = la if la is not None else 0.0
+        dilutent_fee = dilutent_fee if dilutent_fee is not None else 0.0
+        premium = premium if premium is not None else 0.0
         st.write(f"**Delivered Density:** {delivered_density}")
         st.write(f"**Delivered Sulfur:** {delivered_sulfur}")
         st.write(f"**Conversion Factor:** {conversion}")
@@ -96,7 +108,7 @@ with tab1:
         st.write(f"**P/L Tariff:** {pl_tariff}")
         st.write(f"**LA:** {la}")
         st.write(f"**Dilutent Fee:** {dilutent_fee}")
-        st.write(f"**Premium or Discount:** {premium_or_discount}")
+        st.write(f"**Premium or Discount:** {premium}")
         st.write(f"**Equalized:** {'Yes' if equalized == 'Yes' else 'No'}")
         if st.button("Calculate Netback"):
             base_price = ((wti + diff) * conversion * fx) + wadf
@@ -110,7 +122,7 @@ with tab1:
             sulfur_penalty = ((delivered_sulfur - 0.5) / 0.1) * sulphur_equalization_factor
             eq = -(density_penalty + sulfur_penalty)
             trucking_charge = -(5.40 * distance_km) + 225
-            netback = base_price_adjusted + eq + pl_tariff + trucking_charge + la + dilutent_fee + premium_or_discount
+            netback = base_price_adjusted + eq + pl_tariff + trucking_charge + la + dilutent_fee + premium
             st.divider()
             st.success(f"Netback Calculated: {netback:.2f}")
             report_data = {
